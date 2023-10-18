@@ -3,19 +3,13 @@ const cors = require('cors');
 require('dotenv').config()
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
-
 const app=express()
 const port=process.env.PORT || 5000
-
 
 
 //Middleware
 app.use(express.json())
 app.use(cors())
-
-
-//fashion-user
-//DZL9K65CwRS5VzyI
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.j998cjx.mongodb.net/?retryWrites=true&w=majority`;
@@ -35,6 +29,7 @@ async function run() {
     await client.connect();
 
     const productsCollection = client.db('productDB').collection('products')
+    const cartItems = client.db('productDB').collection('cart')
 
 
     // post to mongoDb
@@ -48,6 +43,19 @@ async function run() {
     // get from mongoDb
     app.get('/products',async(req,res)=>{
         const cursor=productsCollection.find()
+       const result=await cursor.toArray()
+       res.send(result)
+    })
+    app.post('/cart',async(req,res)=>{
+        const newproducts= req.body;
+        console.log(newproducts);
+        const result=await cartItems.insertOne(newproducts)
+        res.send(result)
+    })
+
+    // get from mongoDb
+    app.get('/cart',async(req,res)=>{
+        const cursor=cartItems.find()
        const result=await cursor.toArray()
        res.send(result)
     })
