@@ -46,20 +46,41 @@ async function run() {
        const result=await cursor.toArray()
        res.send(result)
     })
+
+
+
     app.post('/cart',async(req,res)=>{
-        const newproducts= req.body;
-        console.log(newproducts);
-        const result=await cartItems.insertOne(newproducts)
-        res.send(result)
+        const newcart= req.body;
+        console.log(newcart);
+        const output=await cartItems.insertOne(newcart)
+        res.send(output)
     })
 
     // get from mongoDb
     app.get('/cart',async(req,res)=>{
         const cursor=cartItems.find()
-       const result=await cursor.toArray()
-       res.send(result)
+       const output=await cursor.toArray()
+       res.send(output)
     })
 
+
+    //fetching data for UPDATE
+    app.get('/products/:id', async(req,res)=>{
+      const id=req.params.id;
+      const query={_id: new ObjectId(id)}
+      const result=await productsCollection.findOne(query)
+      res.send(result)
+  })
+
+
+
+
+
+
+
+
+
+  
 
 
     // Send a ping to confirm a successful connection
