@@ -3,8 +3,8 @@ const cors = require('cors');
 require('dotenv').config()
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
-const app=express()
-const port=process.env.PORT || 5000
+const app = express()
+const port = process.env.PORT || 5000
 
 
 //Middleware
@@ -33,44 +33,64 @@ async function run() {
 
 
     // post to mongoDb
-    app.post('/products',async(req,res)=>{
-        const newproducts= req.body;
-        console.log(newproducts);
-        const result=await productsCollection.insertOne(newproducts)
-        res.send(result)
+    app.post('/products', async (req, res) => {
+      const newproducts = req.body;
+      console.log(newproducts);
+      const result = await productsCollection.insertOne(newproducts)
+      res.send(result)
     })
 
     // get from mongoDb
-    app.get('/products',async(req,res)=>{
-        const cursor=productsCollection.find()
-       const result=await cursor.toArray()
-       res.send(result)
+    app.get('/products', async (req, res) => {
+      const cursor = productsCollection.find()
+      const result = await cursor.toArray()
+      res.send(result)
     })
 
 
 
-    app.post('/cart',async(req,res)=>{
-        const newcart= req.body;
-        console.log(newcart);
-        const output=await cartItems.insertOne(newcart)
-        res.send(output)
+    app.post('/cart', async (req, res) => {
+      const newcart = req.body;
+      console.log(newcart);
+      const output = await cartItems.insertOne(newcart)
+      res.send(output)
     })
 
     // get from mongoDb
-    app.get('/cart',async(req,res)=>{
-        const cursor=cartItems.find()
-       const output=await cursor.toArray()
-       res.send(output)
+    app.get('/cart', async (req, res) => {
+      const cursor = cartItems.find()
+      const output = await cursor.toArray()
+      res.send(output)
     })
 
 
     //fetching data for UPDATE
-    app.get('/products/:id', async(req,res)=>{
-      const id=req.params.id;
-      const query={_id: new ObjectId(id)}
-      const result=await productsCollection.findOne(query)
+    app.get('/products/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await productsCollection.findOne(query)
       res.send(result)
-  })
+    })
+    //Update data
+    app.put('/products/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) }
+      const options = { upsert: true }
+      const updatedProduct = req.body;
+      const newupdatedProduct = {
+        $set: {
+          name: updatedProduct.name,
+          brand: updatedProduct.brand,
+          type: updatedProduct.type,
+          price: updatedProduct.price,
+          shortD: updatedProduct.shortD,
+          rating: updatedProduct.rating,
+          image: updatedProduct.image
+        }
+      }
+      const result = await productsCollection.updateOne(filter, newupdatedProduct, options)
+      res.send(result)
+    })
 
 
 
@@ -80,7 +100,7 @@ async function run() {
 
 
 
-  
+
 
 
     // Send a ping to confirm a successful connection
@@ -95,9 +115,9 @@ run().catch(console.dir);
 
 
 
-app.get('/',(req,res)=>{
-    res.send('products server is running')
+app.get('/', (req, res) => {
+  res.send('products server is running')
 })
-app.listen(port,()=>{
-    console.log('server is running at:',port);
+app.listen(port, () => {
+  console.log('server is running at:', port);
 })
